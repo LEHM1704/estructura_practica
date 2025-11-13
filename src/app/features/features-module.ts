@@ -6,9 +6,13 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorModule } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { PokemonDetail } from './pokemon/pokemon-detail/pokemon-detail';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
-  declarations: [PokemonListComponent],
+  declarations: [PokemonListComponent, PokemonDetail],
   imports: [
     CommonModule,
     FeaturesRoutingModule,
@@ -16,6 +20,9 @@ import { InputTextModule } from 'primeng/inputtext';
     ButtonModule,
     PaginatorModule,
     InputTextModule,
+    ProgressSpinnerModule,
+    FormsModule,
+    ToastModule,
   ],
 })
 export class FeaturesModule {}

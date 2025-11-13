@@ -1,0 +1,47 @@
+<p-toast></p-toast> 
+
+<div class="p-6 max-w-4xl mx-auto">
+  
+  <p-button 
+    label="Volver" 
+    icon="pi pi-arrow-left" 
+    (click)="goBack()" 
+    styleClass="mb-4" 
+    severity="secondary"
+  />
+
+  <div *ngIf="loading" class="flex flex-col justify-center items-center h-64">
+    <p-progress-spinner 
+      strokeWidth="4" 
+      animationDuration=".5s"
+      ariaLabel="loading"
+    />
+    <p class="mt-4 text-gray-500 font-semibold">Buscando en la Pokédex...</p>
+  </div>
+
+  <p-card *ngIf="!loading && pokemon" styleClass="shadow-xl overflow-hidden">
+    
+    <div class="flex flex-col md:flex-row gap-8">
+         <div class="flex-1 flex justify-center items-center bg-blue-50 rounded-xl p-8">
+            <img 
+              [src]="pokemon.sprites?.other?.['official-artwork']?.front_default" 
+              [alt]="pokemon.name"
+              class="w-64 h-64 object-contain drop-shadow-lg"
+            />
+          </div>
+    
+          <div class="flex-1">
+            <h1 class="text-4xl font-bold text-gray-800 capitalize mb-2">
+              {{ pokemon.name }}
+            </h1>
+            <div class="space-y-3 mt-4">
+                <div *ngFor="let s of pokemon.stats" class="flex items-center">
+                    <span class="w-32 font-medium capitalize text-gray-600">{{ s.stat.name }}</span>
+                    <span class="font-bold">{{ s.base_stat }}</span>
+                </div>
+             </div>
+          </div>
+    </div>
+
+  </p-card>
+</div>

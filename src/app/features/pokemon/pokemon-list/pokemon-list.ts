@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { PokemonService } from '../../../core/service/pokemon.service';
 import { PaginatorState } from 'primeng/paginator';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { OnInit } from '@angular/core';
 
 @Component({
@@ -15,19 +15,41 @@ export class PokemonListComponent implements OnInit {
   pokemons: any[] = [];
   totalRecords: number = 0; // Total de Pokémon para el paginador
   rows: number = 20; // Pokémon por página (limit)
+  first: number = 0;
 
   searchTerm: string = ''; // Para el input de búsqueda
 
   // 1. Inyectamos el servicio y el router en el constructor
   constructor(
     private pokemonService: PokemonService,
-    private router: Router // Lo usaremos para navegar al detalle
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.loadPokemons(0); // Cargar la primera página (offset = 0)
+    // 4. ESCUCHAR LA URL
+    // Cada vez que la URL cambie (?page=1, ?page=2), se ejecuta esto
+    this.route.queryParams.subscribe((params) => {
+      const page = params['page'] || 1; // Si no hay page, es la 1
+
+      // Calculamos el offset basado en la página de la URL
+      // Página 1 -> offset 0
+      // Página 2 -> offset 20
+      this.first = (page - 1) * this.rows;
+
+      this.loadPokemons(this.first);
+    });
   }
 
+  getPokemonImage(url: string): string {
+    // La URL es tipo: https://pokeapi.co/api/v2/pokemon/25/
+    // Partimos el string por '/' y el ID suele estar en la penúltima posición
+    const splitUrl = url.split('/');
+    const id = splitUrl[splitUrl.length - 2];
+
+    // Usamos la URL de "official-artwork" que tiene mejor calidad
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+  }
   // 2. Método para cargar los Pokémon
   loadPokemons(offset: number): void {
     this.pokemonService.getPokemons(this.rows, offset).subscribe((response) => {
@@ -39,9 +61,16 @@ export class PokemonListComponent implements OnInit {
   // 3. Método para manejar el Paginador de PrimeNG
   // (Este método se conecta al HTML)
   onPageChange(event: PaginatorState) {
-    // event.first nos da el 'offset' (ej. 0, 20, 40)
-    if (event.first !== undefined) {
-      this.loadPokemons(event.first);
+    if (event.first !== undefined && event.rows !== undefined) {
+      // Calculamos el número de página (ej: offset 20 / 20 rows + 1 = Página 2)
+      const page = event.first / event.rows + 1;
+
+      // Navegamos añadiendo el query param
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { page: page },
+        queryParamsHandling: 'merge', // Mantiene otros filtros si existieran
+      });
     }
   }
 
